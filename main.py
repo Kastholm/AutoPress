@@ -13,6 +13,8 @@ class AutoPress():
         self.url = url
         self.post_fetch_url = f'https://{self.url}/wp-json/wp/v2/posts?per_page=1&page=1'
         self.eligible_posts = []
+        self.fetch_compare_articles()
+        self.generate_new_articles()
 
 
     def render_html_to_plain_text(self, text):
@@ -84,12 +86,6 @@ class AutoPress():
                 #print(gen_articles)
 
 
-        #WP artikler
-        #JSON artikler hvis de ikke findes i forvejen.
-        #Hvis artikel ikke befinder sig i written articles
-        #Så skriv artikel
-        #return self.open_ai.send_prompt(article)
-
     def publish_articles(self):
         pass
                 
@@ -99,10 +95,10 @@ if __name__ == "__main__":
     open_ai = ChatGPT()
     testSite = AutoPress('nyheder24', 'nyheder24.dk', open_ai)
 
-    test = testSite.fetch_compare_articles()
+    #test = testSite.fetch_compare_articles()
 
     #print(test)
-    testSite.generate_new_articles()
+    #testSite.generate_new_articles()
 
 
     '''
