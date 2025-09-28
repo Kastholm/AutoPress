@@ -1,21 +1,33 @@
 import json
+import html
 import requests as req
 import os
+import re
+from models.chatgpt import ChatGPT
 
 class AutoPress():
 
-    def __init__(self, name, url):
+    def __init__(self, name, url, open_ai):
+        self.open_ai = open_ai
         self.name = name
         self.url = url
-        self.post_fetch_url = f'https://{self.url}/wp-json/wp/v2/posts?per_page=10&page=1'
+        self.post_fetch_url = f'https://{self.url}/wp-json/wp/v2/posts?per_page=1&page=1'
         self.eligible_posts = []
-        
+
+
+    def render_html_to_plain_text(self, text):
+        pattern = re.compile(r"<[^>]+>")
+        clean = pattern.sub("", text)
+        return html.unescape(clean)
 
     def generate_load_files(self):
         if not os.path.exists(self.name):
             os.makedirs(self.name)
         if not os.path.exists(f'{self.name}/articles.json'):
             with open(f'{self.name}/articles.json', 'w') as f:
+                json.dump([], f)
+        if not os.path.exists(f'{self.name}/gen_articles.json'):
+            with open(f'{self.name}/gen_articles.json', 'w') as f:
                 json.dump([], f)
         
         with open(f'{self.name}/articles.json', 'r', encoding='utf-8') as f:
@@ -34,8 +46,10 @@ class AutoPress():
             for article in fetched_data:
                 article_arr = ({
                     "id": article['id'],
-                    "name": article['title']['rendered'],
-                    "date": article['date_gmt']
+                    "name": html.unescape(article['title']['rendered']),
+                    "date": article['date_gmt'],
+                    "media": article['featured_media_global']['source_url'],
+                    "content": self.render_html_to_plain_text(article['content']['rendered'])
                 })
 
                 if article_arr not in file_data:
@@ -51,9 +65,30 @@ class AutoPress():
         return self.eligible_posts
 
     
-    def generate_articles(self):
-        #connect to OpenAI
-        pass
+    def generate_new_articles(self):
+        file_data = self.generate_load_files()
+        with open(f'{self.name}/gen_articles.json', 'r', encoding='utf-8') as f:
+            gen_articles = json.load(f)
+
+        existing_ids = []
+        for article in gen_articles:
+            existing_ids.append(article['id'])
+
+        for article in file_data:
+            if article['id'] not in existing_ids:
+                generated_article = self.open_ai.send_prompt(article)
+
+                gen_articles.extend(generated_article)
+                with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
+                    json.dump(gen_articles, f, indent=4, ensure_ascii=False)
+                #print(gen_articles)
+
+
+        #WP artikler
+        #JSON artikler hvis de ikke findes i forvejen.
+        #Hvis artikel ikke befinder sig i written articles
+        #Så skriv artikel
+        #return self.open_ai.send_prompt(article)
 
     def publish_articles(self):
         pass
@@ -61,11 +96,13 @@ class AutoPress():
 
 if __name__ == "__main__":
 
-    testSite = AutoPress('nyheder24', 'nyheder24.dk')
+    open_ai = ChatGPT()
+    testSite = AutoPress('nyheder24', 'nyheder24.dk', open_ai)
 
     test = testSite.fetch_compare_articles()
 
-    print(test)
+    #print(test)
+    testSite.generate_new_articles()
 
 
     '''
