@@ -13,15 +13,25 @@ Teksten skal:
 - Indeholde maks. 2 citater (citater må ikke omskrives).  
 - Være skrevet i journalistisk stil: objektiv, letlæselig, aktivt sprog.  
 - Undgå gentagelser og fyldord.  
-- Byg artiklen op med tydelig rubrik (title), kort teaser og indhold i HTML-format klar til WordPress.  
-- Returnér resultatet i følgende JSON-struktur:
+- Byg artiklen op med tydelig rubrik (title), kort teaser og indhold i HTML-format klar til WordPress.
+- Tildel en meningsfuld kategori blandt Nyheder, Udland, 112(omhanlder politisager i Danmark), Sundhed, hvis ingen kategorier 
+  passer til artiklen, tildel en anden passende kategori.
+- Tildel relevant tags, minimum 1 og maksimalt 3.
+- Returnér resultatet i følgende JSON-struktur, kun objektet, intet andet:
 
-artikel: {
+{
   "id": "Artiklens oprindelig ID",
   "title": "Artiklens titel",
   "teaser": "Artiklens teaser",
-  "content": "<p>Artiklens indhold i HTML</p>"
+  "content": "<p>Artiklens indhold i HTML</p>",
+  "image_url": "eksisterende img url",
+  "category": "Artiklens kategori",
+  "tags: "Artiklens tags"
 }
+"""
+
+image_instructions = """
+Generer et billede der ligner 98% det originale
 """
 
 class ChatGPT:
@@ -50,8 +60,32 @@ class ChatGPT:
         else:
             response = ''
             print("No client available")
+        
+        return response
 
+    def generate_image(self, img):
+        if self.client:
+            try:
+                response = self.client.responses.create(
+                    model='gpt-4.1',
+                    input=[
+                        {
+                        "role": "user",
+                        "content": [
+                            {"type": "input_text", "text": f'{image_instructions}'},
+                            {
+                                "type": "input_image",
+                                "image_url": f'{img}'
+                            }
+                        ],
+                      }
+                    ],
+                    tools=[{"type": "image_generation"}],
+                )
+            except Exception as e:
+                print(f"Error: {e}")
+        else:
+            response = ''
+            print("No client available")
         print(response)
-
-
         return response

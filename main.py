@@ -4,6 +4,7 @@ import requests as req
 import os
 import re
 from models.chatgpt import ChatGPT
+from models.wordpress import WordPress
 
 class AutoPress():
 
@@ -13,8 +14,10 @@ class AutoPress():
         self.url = url
         self.post_fetch_url = f'https://{self.url}/wp-json/wp/v2/posts?per_page=1&page=1'
         self.eligible_posts = []
+        self.posts_to_publish = []
         self.fetch_compare_articles()
         self.generate_new_articles()
+        self.publish_articles()
 
 
     def render_html_to_plain_text(self, text):
@@ -80,25 +83,40 @@ class AutoPress():
             if article['id'] not in existing_ids:
                 generated_article = self.open_ai.send_prompt(article)
 
-                gen_articles.extend(generated_article)
+                '''
+                Generate an image from the image in generated_article
+                and then replace it with the existing image url
+                '''
+
+                parsed_article = json.loads(generated_article)
+                gen_articles.append(parsed_article)
+                self.posts_to_publish.append(parsed_article)
+                
                 with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
                     json.dump(gen_articles, f, indent=4, ensure_ascii=False)
-                #print(gen_articles)
+            else:
+                print('Article already generated')
 
 
     def publish_articles(self):
+        if self.posts_to_publish == []:
+            print('No new posts to post')
+            return
+        
+        for post in self.posts_to_publish:
+            print('Publish', post)
+        #Indhent nye genererede artikler og publish dem til WordPress
+        #Lav guards for at sikre at det er en korrekt artikel der bliver published
         pass
                 
 
 if __name__ == "__main__":
 
     open_ai = ChatGPT()
+
+    #Thread 1
     testSite = AutoPress('nyheder24', 'nyheder24.dk', open_ai)
 
-    #test = testSite.fetch_compare_articles()
-
-    #print(test)
-    #testSite.generate_new_articles()
 
 
     '''
@@ -111,6 +129,4 @@ if __name__ == "__main__":
         - Return
     4. Hvis ikke
         - Returner artiklerne
-    
-    
     '''
