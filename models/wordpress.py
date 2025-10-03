@@ -22,7 +22,8 @@ class WordPress:
                             "content": "<p>Dette er indholdet af en testartikel.</p>",
                             "status": "publish",
                             'image_url': 'https://media.mgdk.dk/wp-content/uploads/sites/2/2025/08/Shutterstock_2054600435.jpg',
-                            'categories': 'Test'
+                            'categories': 'Test',
+                            'categories_desc': 'Test'
                         }]
 
         if self.articles == []:
@@ -39,9 +40,9 @@ class WordPress:
         response = requests.get(url, auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']))
 
         if response.status_code == 200:
-            print(f'✅ AUTH Connection to new site {self.credentials["site"]} sucess')
+            print(f'✅ AUTH Connection to new site {self.credentials["site"]}/{path} sucess')
         else:
-            print(f'⛔ AUTH Connection to new site {self.credentials["site"]} failed: {response.status_code}, {response.text}')
+            print(f'⛔ AUTH Connection to new site {self.credentials["site"]}/{path} failed: {response.status_code}, {response.text}')
             return
 
         return url, response.json()
@@ -62,7 +63,7 @@ class WordPress:
                 category = ({
                         "name": new_article['categories'],
                         "slug": new_article['categories'].lower(),
-                        "description": "Artikler med fokus på aktuelle nyheder",
+                        "description": new_article['categories_desc'],
                         "parent": 0
                         })
                 r = requests.post(
@@ -83,13 +84,10 @@ class WordPress:
         for new_article in self.articles:
 
             #Connect og vælg cat,tag,jour
-            #Tag og kategori er sat af ChatGPT fra start. #DONE
-            #De oprettes derefter i WordPress hvis de ikke findes.
             category_id = self.apply_category(new_article)
             print(category_id)
 
-            
-            #Hvis eller hvis ikke skal ids returneres, så de kan påsættes artikel til oprettelse
+            #TAGS
             
 
 

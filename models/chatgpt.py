@@ -16,7 +16,7 @@ Teksten skal:
 - Byg artiklen op med tydelig rubrik (title), kort teaser og indhold i HTML-format klar til WordPress.
 - Tildel en meningsfuld kategori blandt Nyheder, Udland, 112(omhanlder politisager i Danmark), Sundhed, hvis ingen kategorier 
   passer til artiklen, tildel en anden passende kategori.
-- Tildel relevant tags, minimum 1 og maksimalt 3.
+- Tildel mellem 1 og 3 relevante og fyldige tags til denne tekst. Ignorér tags, der er for generelle eller for tynde.
 - Returnér resultatet i følgende JSON-struktur, kun objektet, intet andet:
 
 {
@@ -25,7 +25,8 @@ Teksten skal:
   "teaser": "Artiklens teaser",
   "content": "<p>Artiklens indhold i HTML</p>",
   "image_url": "eksisterende img url",
-  "category": "Artiklens kategori",
+  "categories": "Artiklens kategori",
+  "categories_desc": "Kategori beskrivelse",
   "tags: "Artiklens tags"
 }
 """
