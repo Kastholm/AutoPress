@@ -13,7 +13,7 @@ class AutoPress():
         self.name = name
         self.url = url
         self.post_fetch_url = f'https://{self.url}/wp-json/wp/v2/posts?per_page=1&page=1'
-        self.eligible_posts = []
+        self.eligible_posts_arr = []
         self.posts_to_publish = []
         self.fetch_compare_articles()
         self.generate_new_articles()
@@ -43,12 +43,12 @@ class AutoPress():
 
     def fetch_compare_articles(self):
 
-        r = req.get(self.post_fetch_url)
+        fetch_articles_req = req.get(self.post_fetch_url)
 
-        if r.status_code == 200:
-            file_data = self.generate_load_files()
-            fetched_data = r.json()
-            for article in fetched_data:
+        if fetch_articles_req.status_code == 200:
+            load_article_json_file = self.generate_load_files()
+            fetched_articles_json = fetch_articles_req.json()
+            for article in fetched_articles_json:
                 article_arr = ({
                     "id": article['id'],
                     "name": html.unescape(article['title']['rendered']),
@@ -57,17 +57,18 @@ class AutoPress():
                     "content": self.render_html_to_plain_text(article['content']['rendered'])
                 })
 
-                if article_arr not in file_data:
-                    self.eligible_posts.append(article_arr)
+                if article_arr not in load_article_json_file:
+                    self.eligible_posts_arr.append(article_arr)
             
-            file_data.extend(self.eligible_posts)
+            load_article_json_file.extend(self.eligible_posts_arr)
+
             with open(f'{self.name}/articles.json', 'w', encoding='utf-8') as f:
-                json.dump(file_data, f, indent=4, ensure_ascii=False)
+                json.dump(load_article_json_file, f, indent=4, ensure_ascii=False)
         
         else:
             print('error fetching posts')
             
-        return self.eligible_posts
+        return self.eligible_posts_arr
 
     
     def generate_new_articles(self):
@@ -91,6 +92,7 @@ class AutoPress():
                 parsed_article = json.loads(generated_article)
                 gen_articles.append(parsed_article)
                 self.posts_to_publish.append(parsed_article)
+                print('Append here to gen')
                 
                 with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
                     json.dump(gen_articles, f, indent=4, ensure_ascii=False)
@@ -104,7 +106,9 @@ class AutoPress():
             return
         
         for post in self.posts_to_publish:
-            print('Publish', post)
+            #Sæt id til ''
+            print('Publish to WP', post)
+            WordPress([post])
         #Indhent nye genererede artikler og publish dem til WordPress
         #Lav guards for at sikre at det er en korrekt artikel der bliver published
         pass
