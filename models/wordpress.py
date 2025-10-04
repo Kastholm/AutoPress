@@ -24,7 +24,7 @@ class WordPress:
                             'image_url': 'https://media.mgdk.dk/wp-content/uploads/sites/2/2025/08/Shutterstock_2054600435.jpg',
                             'categories': 'Test',
                             'categories_desc': 'Test',
-                            'tags': 'test, testt, testtt'
+                            'tags': 'test, testt, aasdfasdfasdf'
                         }]
 
         if self.articles == []:
@@ -83,44 +83,37 @@ class WordPress:
 
     def apply_tags(self, new_article):
         if new_article['tags']:
-            tag_ids = []
-            fetch_url, _ = self.connect_to_wordpress('tags')
+            apply_tag_ids_arr = []
+            fetched_fuzzy_tags_arr = []
+            fetch_url = f'https://{self.credentials["site"]}/wp-json/wp/v2/tags/?per_page=100&&context=edit'
             tags = [t.strip() for t in new_article['tags'].split(',')]
             
             for tag in tags:
-                url = f'https://{self.credentials["site"]}/wp-json/wp/v2/tags?search={tag}'
+                #See if article tags exist in the database, if so apply tags to array.
+                url = f'https://{self.credentials["site"]}/wp-json/wp/v2/tags?slug={tag.lower()}'
                 s = requests.Session()
                 s.auth = HTTPBasicAuth(self.credentials['user'], self.credentials['pass'])
-                response = requests.get(url, auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']))
-                fetched_fuzzy_tags = response.json()
+                tag_response = requests.get(url, auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']))
+                tag_response_json = tag_response.json()
 
-                for fuzzy_tag in fetched_fuzzy_tags:
-                    
-                    if fuzzy_tag['name'] == tag:
-                        print(tag, fuzzy_tag['name'])
-                        tag_ids.append(fuzzy_tag['id'])
+                if tag_response_json == []:
+                    tag = ({
+                            "name": tag,
+                            "slug": tag.lower(),
+                            "description": ''
+                            })
+                    r = requests.post(
+                        fetch_url,
+                        json=tag,
+                        auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
+                        headers={"Content-Type": "application/json"}
+                    )
+                    tag_json = r.json()
+                    apply_tag_ids_arr.append(tag_json['id'])
+                else:
+                    apply_tag_ids_arr.append(tag_response_json[0]['id'])
 
-                    
-
-
-                
-                #if tag not in fuzzy_tag['name']:
-                #    print('not exist tag')
-                #    tag = ({
-                #            "name": tag,
-                #            "slug": tag.lower(),
-                #            "description": ''
-                #            })
-                #    r = requests.post(
-                #        fetch_url,
-                #        json=tag,
-                #        auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
-                #        headers={"Content-Type": "application/json"}
-                #    )
-                #    tag_json = r.json()
-                #    tag_ids.append(tag_json['id'])
-
-            return tag_ids
+            return apply_tag_ids_arr
             
 
 
@@ -159,7 +152,7 @@ class WordPress:
                 headers={"Content-Type": "application/json"}
             )
 
-            print(new_article,'⚔️')
+            print(ready_article,'⚔️')
 
             if r.status_code == 201:
                 print(f'✅ AUTH Connection to new site {self.credentials["site"]} sucess')
