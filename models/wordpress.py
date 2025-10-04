@@ -23,7 +23,8 @@ class WordPress:
                             "status": "publish",
                             'image_url': 'https://media.mgdk.dk/wp-content/uploads/sites/2/2025/08/Shutterstock_2054600435.jpg',
                             'categories': 'Test',
-                            'categories_desc': 'Test'
+                            'categories_desc': 'Test',
+                            'tags': 'test, testt, aasdfasdfasdf'
                         }]
 
         if self.articles == []:
@@ -78,7 +79,46 @@ class WordPress:
                 print('Doesnt exist, create new cat')
             
             return category_id
+
+
+    def apply_tags(self, new_article):
+        if new_article['tags']:
+            apply_tag_ids_arr = []
+            fetched_fuzzy_tags_arr = []
+            fetch_url = f'https://{self.credentials["site"]}/wp-json/wp/v2/tags/?per_page=100&&context=edit'
+            tags = [t.strip() for t in new_article['tags'].split(',')]
             
+            for tag in tags:
+                #See if article tags exist in the database, if so apply tags to array.
+                url = f'https://{self.credentials["site"]}/wp-json/wp/v2/tags?slug={tag.lower()}'
+                s = requests.Session()
+                s.auth = HTTPBasicAuth(self.credentials['user'], self.credentials['pass'])
+                tag_response = requests.get(url, auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']))
+                tag_response_json = tag_response.json()
+
+                if tag_response_json == []:
+                    tag = ({
+                            "name": tag,
+                            "slug": tag.lower(),
+                            "description": ''
+                            })
+                    r = requests.post(
+                        fetch_url,
+                        json=tag,
+                        auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
+                        headers={"Content-Type": "application/json"}
+                    )
+                    tag_json = r.json()
+                    apply_tag_ids_arr.append(tag_json['id'])
+                else:
+                    apply_tag_ids_arr.append(tag_response_json[0]['id'])
+
+            return apply_tag_ids_arr
+            
+
+
+
+            # EVT GET /wp/v2/tags?search=navn TODO
 
     def publish_post(self):
         for new_article in self.articles:
@@ -86,6 +126,8 @@ class WordPress:
             #Connect og vælg cat,tag,jour
             category_id = self.apply_category(new_article)
             print(category_id)
+            tag_ids = self.apply_tags(new_article)
+            print(tag_ids)
 
             #TAGS
             
@@ -99,7 +141,8 @@ class WordPress:
                         "content": "<p>Dette er indholdet af en testartikel.</p>",
                         "status": "publish",
                         'image_url': 'https://media.mgdk.dk/wp-content/uploads/sites/2/2025/08/Shutterstock_2054600435.jpg',
-                        'categories': category_id
+                        'categories': category_id,
+                        'tags': tag_ids
             })
 
             r = requests.post(
@@ -109,7 +152,7 @@ class WordPress:
                 headers={"Content-Type": "application/json"}
             )
 
-            print(new_article,'⚔️')
+            print(ready_article,'⚔️')
 
             if r.status_code == 201:
                 print(f'✅ AUTH Connection to new site {self.credentials["site"]} sucess')
