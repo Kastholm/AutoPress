@@ -1,11 +1,13 @@
 import os
 import requests
+import base64
+from slugify import slugify
 from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
 
 class WordPress:
 
-    def __init__(self):
+    def __init__(self, articles, webp_img):
         load_dotenv()
         self.credentials = {
             'user': os.getenv('WP_USERNAME'),
@@ -17,15 +19,8 @@ class WordPress:
         if not self.credentials['pass']:
             print('credentials not set')
 
-        self.articles = [{
-                            "title": "Dummy artikel",
-                            "content": "<p>Dette er indholdet af en testartikel.</p>",
-                            "status": "publish",
-                            'image_url': 'https://media.mgdk.dk/wp-content/uploads/sites/2/2025/08/Shutterstock_2054600435.jpg',
-                            'categories': 'Test',
-                            'categories_desc': 'Test',
-                            'tags': 'test, testt, aasdfasdfasdf'
-                        }]
+        self.articles = articles
+        self.webp = webp_img
 
         if self.articles == []:
             print('No articles to WordPress')
@@ -63,7 +58,7 @@ class WordPress:
             if category_id == '':
                 category = ({
                         "name": new_article['categories'],
-                        "slug": new_article['categories'].lower(),
+                        "slug": slugify(new_article['categories']),
                         "description": new_article['categories_desc'],
                         "parent": 0
                         })
@@ -73,10 +68,13 @@ class WordPress:
                     auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
                     headers={"Content-Type": "application/json"}
                 )
-                category_json = r.json()
-                print(category_json)
-                category_id = category_json['id']
-                print('Doesnt exist, create new cat')
+                if r.status_code == 201:
+                    category_json = r.json()
+                    print(category_json)
+                    category_id = category_json['id']
+                    print('New Category created')
+                else:
+                    print('Category request post failed ❌')
             
             return category_id
 
@@ -90,7 +88,7 @@ class WordPress:
             
             for tag in tags:
                 #See if article tags exist in the database, if so apply tags to array.
-                url = f'https://{self.credentials["site"]}/wp-json/wp/v2/tags?slug={tag.lower()}'
+                url = f'https://{self.credentials["site"]}/wp-json/wp/v2/tags?slug={slugify(tag)}'
                 s = requests.Session()
                 s.auth = HTTPBasicAuth(self.credentials['user'], self.credentials['pass'])
                 tag_response = requests.get(url, auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']))
@@ -99,7 +97,7 @@ class WordPress:
                 if tag_response_json == []:
                     tag = ({
                             "name": tag,
-                            "slug": tag.lower(),
+                            "slug": slugify(tag),
                             "description": ''
                             })
                     r = requests.post(
@@ -108,17 +106,54 @@ class WordPress:
                         auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
                         headers={"Content-Type": "application/json"}
                     )
-                    tag_json = r.json()
-                    apply_tag_ids_arr.append(tag_json['id'])
+                    if r.status_code == 201:
+                        print('tag data posted')
+                        tag_json = r.json()
+                        apply_tag_ids_arr.append(tag_json['id'])
+                    else:
+                        priont('tag data failed request ❌')
                 else:
                     apply_tag_ids_arr.append(tag_response_json[0]['id'])
 
             return apply_tag_ids_arr
+
+    def apply_img(self, new_article):
+        
+        lib_url = f'https://{self.credentials["site"]}/wp-json/wp/v2/media'
+
+        filename = f"{slugify(new_article['image_title'])}.webp"
+        
+        r = requests.post(
+            lib_url,
+            files={'file': (filename, self.webp, 'image/webp')},
+            auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
+            headers={"Content-Disposition": f"attachment; filename=\"{filename}\""}
+        )
+        
+        print(f'Image upload status: {r.status_code}')
+        print(f'Image upload response: {r.text}')
+        
+        if r.status_code == 201:
+            data = r.json()
+            print(data, 'IMAGE DATA REQUESTED')
             
-
-
-
-            # EVT GET /wp/v2/tags?search=navn TODO
+            media_id = data["id"]
+            print('ID', media_id)
+            
+            # Update image metadata
+            update_response = requests.post(
+                f"{lib_url}/{media_id}",
+                json={"alt_text": new_article['image_desc'], "caption": "AI Genereret"},
+                auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
+                headers={"Content-Type": "application/json"}
+            )
+            print(f'Image metadata update status: {update_response.status_code}')
+            
+            return media_id
+        else:
+            print(f'❌ Image upload failed: {r.status_code}, {r.text}')
+            return None
+            
 
     def publish_post(self):
         for new_article in self.articles:
@@ -128,19 +163,22 @@ class WordPress:
             print(category_id)
             tag_ids = self.apply_tags(new_article)
             print(tag_ids)
-
-            #TAGS
+            img_id = self.apply_img(new_article)
+            print(img_id)
             
+            # Skip posting if image upload failed
+            if img_id is None:
+                print('❌ Skipping post due to failed image upload')
+                continue
 
-
-
-            #Journalister - ale journalist ids hentes, og 1 vælges random
+            
+            #TODO tilvælg en random journalist
 
             ready_article = ({
-                        "title": "Dummy artikel",
-                        "content": "<p>Dette er indholdet af en testartikel.</p>",
+                        "title": new_article['title'],
+                        "content": new_article['content'],
                         "status": "publish",
-                        'image_url': 'https://media.mgdk.dk/wp-content/uploads/sites/2/2025/08/Shutterstock_2054600435.jpg',
+                        'featured_media': img_id,
                         'categories': category_id,
                         'tags': tag_ids
             })
@@ -160,7 +198,3 @@ class WordPress:
                 print(f'⛔ AUTH Connection to new site {self.credentials["site"]} failed: {r.status_code}, {r.text}')
             return
             r.raise_for_status()
-
-
-if __name__ == "__main__":
-    t = WordPress()
