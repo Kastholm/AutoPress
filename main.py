@@ -3,6 +3,7 @@ import html
 import requests as req
 import os
 import re
+import time
 from models.chatgpt import ChatGPT
 from models.wordpress import WordPress
 
@@ -15,6 +16,7 @@ class AutoPress():
         self.post_fetch_url = f'https://{self.url}/wp-json/wp/v2/posts?per_page=1&page=1'
         self.eligible_posts_arr = []
         self.posts_to_publish = []
+        self.webp_image_gen = ''
         self.fetch_compare_articles()
         self.generate_new_articles()
         self.publish_articles()
@@ -83,16 +85,18 @@ class AutoPress():
         for article in file_data:
             if article['id'] not in existing_ids:
                 generated_article = self.open_ai.send_prompt(article)
-
-                '''
-                Generate an image from the image in generated_article
-                and then replace it with the existing image url
-                '''
-
                 parsed_article = json.loads(generated_article)
+
+                #TODO Undersøg om et relevant billede allerede findes i db ud fra titel/desc og brug
+                #dette i stedet for at reducerer bruig af tokens.
+                generated_image_webp = self.open_ai.generate_img_two(
+                    parsed_article['title'], parsed_article['image_url'], 
+                    parsed_article['image_prompt']
+                    )
+                self.webp_image_gen = generated_image_webp
                 gen_articles.append(parsed_article)
+
                 self.posts_to_publish.append(parsed_article)
-                print('Append here to gen')
                 
                 with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
                     json.dump(gen_articles, f, indent=4, ensure_ascii=False)
@@ -106,31 +110,20 @@ class AutoPress():
             return
         
         for post in self.posts_to_publish:
-            #Sæt id til ''
             print('Publish to WP', post)
-            WordPress([post])
-        #Indhent nye genererede artikler og publish dem til WordPress
-        #Lav guards for at sikre at det er en korrekt artikel der bliver published
-        pass
+            WordPress([post], self.webp_image_gen)
                 
 
 if __name__ == "__main__":
 
     open_ai = ChatGPT()
-
-    #Thread 1
     testSite = AutoPress('nyheder24', 'nyheder24.dk', open_ai)
 
+    #for i in range(100):
+    #    testSite = AutoPress('nyheder24', 'nyheder24.dk', open_ai)
+    #    time.sleep(600)
+
+    #testSite = AutoPress('dagens', 'dagens.dk', open_ai)
 
 
-    '''
-    Burde koden kører i loop hvert 2 min cirka? og hvis den seneste post er en ny for et givent site, så begynd at udgiv den ?
-    
-    
-    1. Fetch artikler og generer filer.
-    2. Tjek om om fetched artikel allerede er fetched før via compare med file.
-    3. Hvis den er i filen
-        - Return
-    4. Hvis ikke
-        - Returner artiklerne
-    '''
+    #TODO hvis billede kommer fra steder uden ophavsret som TikTok/Instagram etc. Så medtag billedet uden AI
