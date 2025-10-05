@@ -1,6 +1,8 @@
 import json
 import html
 import requests as req
+from PIL import Image
+from io import BytesIO
 import os
 import re
 import time
@@ -51,11 +53,23 @@ class AutoPress():
             load_article_json_file = self.generate_load_files()
             fetched_articles_json = fetch_articles_req.json()
             for article in fetched_articles_json:
+                
+                #Getting image caption, so we can check if the image has copyright,
+                #if not, then AI doesnt need to gen a new img.
+                image_caption = ''
+                image_src = req.get(f"https://{self.url}/wp-json/wp/v2/media/{article['featured_media']}")
+                print(image_src)
+                if image_src.status_code == 200:
+                    image_json = image_src.json()
+                    print(image_json)
+                    image_caption = image_json['caption']['rendered']
+
                 article_arr = ({
                     "id": article['id'],
                     "name": html.unescape(article['title']['rendered']),
                     "date": article['date_gmt'],
                     "media": article['featured_media_global']['source_url'],
+                    "image_caption": image_caption,
                     "content": self.render_html_to_plain_text(article['content']['rendered'])
                 })
 
@@ -87,15 +101,48 @@ class AutoPress():
                 generated_article = self.open_ai.send_prompt(article)
                 parsed_article = json.loads(generated_article)
 
+
                 #TODO Undersøg om et relevant billede allerede findes i db ud fra titel/desc og brug
                 #dette i stedet for at reducerer bruig af tokens.
-                generated_image_webp = self.open_ai.generate_img_two(
-                    parsed_article['title'], parsed_article['image_url'], 
-                    parsed_article['image_prompt']
-                    )
-                self.webp_image_gen = generated_image_webp
-                gen_articles.append(parsed_article)
+                AI_img_gen = False
+                #TODO lav whitelist til AI
+                whitelist = [
+                    'tiktok',
+                    'facebook',
+                    'instagram',
+                    'youtube',
+                    'google',
+                    'unsplash.com',
+                    'pexels.com',
+                    'pixabay.com',
+                    'flickr.com/photos/publicdomain',
+                    'publicdomainpictures.net',
+                    'freeimages.com',
+                    'commons.wikimedia.org',
+                    'burst.shopify.com',
+                    'stocksnap.io',
+                    'rawpixel.com',
+                    'kaboompics.com'
+                ]
 
+                for domain in whitelist:
+                    if domain in self.render_html_to_plain_text(article['image_caption']).lower():
+                        img = Image.open(BytesIO(request.get(article['media']).content))
+                        image_webp = img.convert("RGB").save(output, format="WEBP", quality=80)
+                    else:
+                        AI_img_gen = True
+                
+                #if relevant billede findes i db
+                #AI-img_gen == False og påvælg billedet
+
+
+                if AI_img_gen == True:    
+                    image_webp = self.open_ai.generate_img(
+                        parsed_article['title'], parsed_article['image_url']
+                        )
+                
+                self.webp_image_gen = image_webp
+                gen_articles.append(parsed_article)
                 self.posts_to_publish.append(parsed_article)
                 
                 with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
@@ -119,6 +166,9 @@ if __name__ == "__main__":
     open_ai = ChatGPT()
     testSite = AutoPress('nyheder24', 'nyheder24.dk', open_ai)
 
+
+
+
     #for i in range(100):
     #    testSite = AutoPress('nyheder24', 'nyheder24.dk', open_ai)
     #    time.sleep(600)
@@ -127,3 +177,8 @@ if __name__ == "__main__":
 
 
     #TODO hvis billede kommer fra steder uden ophavsret som TikTok/Instagram etc. Så medtag billedet uden AI
+    #TODO Jetpack til deling på Sociale Medier
+    #TODO Opret site i GAM
+
+    #TODO overvej andre metoder til at indsætte artikler i JSON fil til generering.
+    #Lige nu virker det kun med WOrdPress, men det kan jo virke med alt, så længe det bliver indsat korrekt i JSON
