@@ -153,6 +153,74 @@ class WordPress:
         else:
             print(f'❌ Image upload failed: {r.status_code}, {r.text}')
             return None
+
+
+    def image_decision(self, new_article):
+        #TODO Undersøg om et relevant billede allerede findes i db ud fra titel/desc og brug
+        #dette i stedet for at reducerer bruig af tokens.
+        #TODO lav whitelist til AI
+
+        #TODO AI kan først tjekke image caption og der er noget licens.
+        #I samme prompt kan den vel derefter modtage listen af de billeder der ef kommet frem fra database
+        #og se om den mener nogen af disse passer til. Den kan søge efter titel så.
+
+        #1 ser om den mener at billedet bare kan bruges da der ikke er licens, hvis ja returner boolean til True og kør denne
+        AI_satisfied = False
+
+        prompt=f"Billedets caption = {article['image_caption']}"
+        instructions=f"""
+        Ud fra denne caption skal du vurdere om billedet er licensfrit.
+        Alle billeder fra TikTok, Facebook, Instagram, youtube, Google Maps osv er skærmbilleder, derfor er de godkendte og licensfrie.
+        Såvel som billeder fra gratis sites som Pexels, Pixabay, Unsplash og andre du kender.
+
+        Alt i alt, skal du vurdere om dette billede er licensfrit og om vi kan benytte det til vores artikel.
+
+        Det originale billede kan du se her hvis det hjælper dig med din vurdering:
+        {article['media']}
+
+        Du skal returnere i dette JSON format ud fra om det er licensfrit eller ikke.
+        False = Ikke Licensfrit
+        True = Licensfrit
+
+        {{
+            'Licence': bool
+        }}
+        """
+        response = open_ai.send_prompt(prompt, instructions)
+
+        ai_response = json.loads(response)
+
+        print(response, ai_response)
+
+        if ai_response['License'] is True:
+            img = Image.open(BytesIO(request.get(article['media']).content))
+            image_webp = img.convert("RGB").save(output, format="WEBP", quality=80)
+        else:
+            img = WordPress.search_db_for_img(article['image_title'])
+
+        #2 Hvis AI mener det ikke er licensfrit lad os gå databasen igennem
+        #https://nyheder24.dk/wp-json/wp/v2/media?search=
+        #Få en masse billeder returneret og lad AI vælge om en af dem har relevans
+        #Hvis det har relevans, få det returneret
+        #if AI_satisfied == True:
+        #    img = WordPress.search_db_for_img(parsed_article['image_searchword'])
+        #    #indhent id
+
+        #Til sidst kan det vel vælges her om self.apply_img er nødvendig og et byt billede skal genereres?
+        #apply_img func kon også bare forlænges, vi skal bare have et id til sidst.
+
+
+            #3 Hvis intet af det ovenstående har lykkedes, generer et nyt billede
+        
+        
+        #image_webp = self.open_ai.generate_img(
+        #    parsed_article['title'], parsed_article['image_url']
+        #    )
+
+
+
+        #https://nyheder24.dk/wp-json/wp/v2/media?search=
+        print(searchword)
             
 
     def publish_post(self):

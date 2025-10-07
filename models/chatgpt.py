@@ -16,7 +16,7 @@ Teksten skal:
 - Ikke starte artiklen med "I en...".  
 - Indeholde maks. 2 citater (citater må ikke omskrives).  
 - Være skrevet i journalistisk stil: objektiv, letlæselig, aktivt sprog.  
-- Undgå gentagelser og fyldord.  
+- Undgå gentagelser og fyldord.
 - Byg artiklen op med tydelig rubrik (title), kort teaser og indhold i HTML-format klar til WordPress.
 - Tildel en meningsfuld kategori blandt Nyheder, Udland, 112(omhanlder politisager i Danmark), Sundhed, hvis ingen kategorier 
   passer til artiklen, tildel en anden passende kategori.
@@ -29,13 +29,9 @@ Teksten skal:
   "teaser": "Artiklens teaser",
   "content": "<p>Artiklens indhold i HTML</p>",
   "image_url": "eksisterende img url",
-  "image_prompt": "Prompt til at generere et billede til artiklen",
-  "image_title": "Titel det genererede billede",
-  "image_desc": "Beskrivelse af hvad billedet indeholder",
   "categories": "Artiklens kategori",
   "categories_desc": "Kategori beskrivelse",
   "tags: "Artiklens tags",
-  "image_searchword": "Et engelsk søgeord til Pexels, Unsplash API. Ord som 'Donald Trump', 'Supermarket', 'Boeing Airplane'"
 }
 """
 
@@ -51,11 +47,11 @@ class ChatGPT:
         else:
             print("None or not usable API key provided")
 
-    def send_prompt(self, prompt):
+    def send_prompt(self, prompt, instructions=instructions):
         if self.client:
             try:
                 response = self.client.responses.create(
-                    model='gpt-4o-mini',
+                    model='gpt-5-mini',
                     instructions=instructions,
                     input=f'{prompt}',
                 )
