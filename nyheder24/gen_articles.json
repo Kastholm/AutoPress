@@ -37,5 +37,18 @@
         "categories": "Nyheder",
         "categories_desc": "Opdateringer om aktuelle hændelser og interessante historier.",
         "tags": "underholdning, sociale medier, overraskelser"
+    },
+    {
+        "id": 128945,
+        "title": "Misd-informationen om Vingegaards tredje barn blomstrer: Hvad er sandt?",
+        "teaser": "Den seneste historie om Jonas Vingegaard, der angiveligt venter sit tredje barn, har skabt storm på sociale medier. Men hvad gemmer sig bag de virale opslag?",
+        "content": "<p>Historien om Jonas Vingegaard og hans kone, der angiveligt venter deres tredje barn, har på kort tid vakt stor opmærksomhed på sociale medier. Det siges, at parret skal have en datter, Sofia, og nyheden er blevet delt tusindvis af gange, hvilket skaber bølger blandt cykelsportens fans.</p><p>Flere Facebook-sider har publiceret nyheden i forskellige varianter, hvilket har resulteret i utallige lykønskninger og kommentarer fra både danske og internationale brugere. Dog kan det ikke bekræftes, at de pågældende oplysninger stammer fra danske nyhedsmedier.</p><p>Historien har tiltrukket sig opmærksomhed fra faktatjekmediet TjekDet, der har gransket de kilder, historien udspringer fra. Undersøgelsen afslører, at informationerne stammer fra tre Facebook-sider med fokus på cykelsport, som har været aktive siden sommeren. Disse sider, Cycle Pulse, Cycling Squad og Cycling Pulse, har offentliggjort et væld af sensationelle historier, hvor mange viser sig at være usande.</p><p>I september måned alene har disse sider publiceret over 300 opslag, ofte med dramatiske overskrifter og billeder af populære cyklister. Ifølge TjekDet benytter de sig af en simpel opskrift: kort tekst med en påstand og et links til fulde artikler, som leder til annoncefyldte hjemmesider. Det er netop her bagmændene genererer indtægter.</p><p>Selvom siderne foregiver at være amerikanske, tyder efterforskningen på, at de faktisk drives fra Vietnam. Tidligere har de også haft klager om falske historier om ryttere som Tadej Pogacar og Mathieu van der Poel.</p><p>Indtil videre har Jonas Vingegaard hverken bekræftet eller afvist spekulationerne, ligesom der ikke er kommet nogen officielle kommentarer fra hans hold. TjekDet har til forsøgt at kontakte administratorer af de nævnte Facebook-sider, men uden held.</p><p>Den vedholdende spredning af historien om “Sofia” illustrerer, hvordan misinformation kan brede sig lynhurtigt, især når det handler om kendte personer og følsomme emner. Cykelverdenen må nu navigere gennem denne misinformation, der næppe vil forsvinde med det samme.</p>",
+        "image_url": "https://media.mgdk.dk/wp-content/uploads/sites/2/2025/10/20240713-191849-4-1920x957web.jpg",
+        "image_prompt": "Billede af Jonas Vingegaard på cyklen under et cykelløb.",
+        "image_title": "Jonas Vingegaard på cyklen",
+        "image_desc": "Jonas Vingegaard iført cykeltøj under et cykelløb, i aktion.",
+        "categories": "Nyheder",
+        "categories_desc": "Opdateringer og informationer om aktuelle begivenheder.",
+        "tags": "cykelsport, misinformation, sociale medier"
     }
 ]
