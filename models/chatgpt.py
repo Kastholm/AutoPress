@@ -47,11 +47,11 @@ class ChatGPT:
         else:
             print("None or not usable API key provided")
 
-    def send_prompt(self, prompt, instructions=instructions):
+    def send_prompt(self, prompt, instructions=instructions, version='gpt-5-mini'):
         if self.client:
             try:
                 response = self.client.responses.create(
-                    model='gpt-5-mini',
+                    model=version,
                     instructions=instructions,
                     input=f'{prompt}',
                 )

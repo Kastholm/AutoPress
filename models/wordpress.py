@@ -1,6 +1,7 @@
 import os
 import requests
 import base64
+import json
 from slugify import slugify
 from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
@@ -155,19 +156,12 @@ class WordPress:
             return None
 
 
-    def image_decision(self, new_article):
-        #TODO Undersøg om et relevant billede allerede findes i db ud fra titel/desc og brug
-        #dette i stedet for at reducerer bruig af tokens.
-        #TODO lav whitelist til AI
-
-        #TODO AI kan først tjekke image caption og der er noget licens.
-        #I samme prompt kan den vel derefter modtage listen af de billeder der ef kommet frem fra database
-        #og se om den mener nogen af disse passer til. Den kan søge efter titel så.
-
-        #1 ser om den mener at billedet bare kan bruges da der ikke er licens, hvis ja returner boolean til True og kør denne
+    def image_decision(self, open_ai, new_article):
+        image_webp = ''
+        image_library_id = ''
         AI_satisfied = False
-
-        prompt=f"Billedets caption = {article['image_caption']}"
+        #Investigate if the image has no License and therefore can be used.
+        prompt=f"Billedets caption = {new_article['image_caption']}"
         instructions=f"""
         Ud fra denne caption skal du vurdere om billedet er licensfrit.
         Alle billeder fra TikTok, Facebook, Instagram, youtube, Google Maps osv er skærmbilleder, derfor er de godkendte og licensfrie.
@@ -176,51 +170,82 @@ class WordPress:
         Alt i alt, skal du vurdere om dette billede er licensfrit og om vi kan benytte det til vores artikel.
 
         Det originale billede kan du se her hvis det hjælper dig med din vurdering:
-        {article['media']}
+        {new_article['media']}
+
+        Vi skal bruge et søgeord ud fra titlen {new_article['media_title']}.
+        F.eks hvis titlen er 'Edderkop kravler hen af gulvet' skal søgeordet bare være Edderkop.
+        Hvis artiklen omhandler en privatperson hvor billedegenerering ikke er tilladt, som fx 'Jonas Vingegaard',
+        skal søgeordet være noget som fx 'Cykelrytter', 'Tour de France'. 
 
         Du skal returnere i dette JSON format ud fra om det er licensfrit eller ikke.
         False = Ikke Licensfrit
         True = Licensfrit
 
         {{
-            'Licence': bool
+            "License": bool,
+            "Reason": string,
+            "Searchword": string
         }}
         """
-        response = open_ai.send_prompt(prompt, instructions)
-
-        ai_response = json.loads(response)
-
-        print(response, ai_response)
-
-        if ai_response['License'] is True:
-            img = Image.open(BytesIO(request.get(article['media']).content))
+        whitelist_response = open_ai.send_prompt(prompt, instructions, version='gpt-5-nano')
+        ai_whitelist_response = json.loads(whitelist_response)
+        print(ai_whitelist_response['Reason'])
+        #Extract webp bytes to img upload
+        if ai_whitelist_response['License'] is True:
+            img = Image.open(BytesIO(request.get(new_article['media']).content))
             image_webp = img.convert("RGB").save(output, format="WEBP", quality=80)
+            AI_satisfied = True
         else:
-            img = WordPress.search_db_for_img(article['image_title'])
+            #Check if an usable image already exists in the database
+            url = f"https://{self.credentials['site']}/wp-json/wp/v2/media?search={ai_whitelist_response['Searchword']}"
+            resp_images = requests.get(url, auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']))
+            resp_images_json = resp_images.json()
+            if resp_images_json:
+                fetched_imgs = []
+                for img in resp_images_json:
+                    img_data = ({
+                        "id": img['id'],
+                        "title": img['title']['rendered'],
+                        "desc": img['alt_text']
+                    })
+                    fetched_imgs.append(img_data)
+                print(fetched_imgs)
+                prompt = f'JSON liste med billeder ud fra søgeord: {fetched_imgs}'
+                instructions= f""" 
+                Du får en liste af billeder fra et wordpress bibliotek.
+                Du skal vurdere om en af disse billeder vil passe til artiklen med titel {new_artcile['title']}.
+                
+                Hvis du mener en billerderne passer til artiklen.
+                Fortæller du det i dette JSON format, som er det eneste du skal returnere.
 
-        #2 Hvis AI mener det ikke er licensfrit lad os gå databasen igennem
-        #https://nyheder24.dk/wp-json/wp/v2/media?search=
-        #Få en masse billeder returneret og lad AI vælge om en af dem har relevans
-        #Hvis det har relevans, få det returneret
-        #if AI_satisfied == True:
-        #    img = WordPress.search_db_for_img(parsed_article['image_searchword'])
-        #    #indhent id
+                {{
+                    "image_id": "tom hvis ingen valgt, ellers skriv image id fra JSON",
+                    "reason": "kort forklaring hvis et billede er valgt"
+                }} 
+                """
+                database_img_response = open_ai.send_prompt(prompt, instructions, version='gpt-5-nano')
+                database_img_response_json = database_img_response.json()
+                if database_img_response && database_img_response['image_id']:
+                    image_library_id = database_img_response['image_id']
+                    AI_satisfied = True
 
-        #Til sidst kan det vel vælges her om self.apply_img er nødvendig og et byt billede skal genereres?
-        #apply_img func kon også bare forlænges, vi skal bare have et id til sidst.
+        #Generate an image with AI of nothing succeded
+        if not AI_satisfied && image_library_id == '':
+            image_webp = self.open_ai.generate_img(
+                new_article['title'], new_article['image_url']
+            )
 
+        if image_library_id != '':
+            image_id = image_library_id
+        else
+            img_id = self.apply_img(new_article)
+            #return id
+            break
+        #Klargør til publish_post
 
-            #3 Hvis intet af det ovenstående har lykkedes, generer et nyt billede
-        
-        
-        #image_webp = self.open_ai.generate_img(
-        #    parsed_article['title'], parsed_article['image_url']
-        #    )
+        return image_id
+                
 
-
-
-        #https://nyheder24.dk/wp-json/wp/v2/media?search=
-        print(searchword)
             
 
     def publish_post(self):

@@ -6,12 +6,19 @@ from io import BytesIO
 import os
 import re
 import time
+from dotenv import load_dotenv
 from models.chatgpt import ChatGPT
 from models.wordpress import WordPress
 
 class AutoPress():
 
     def __init__(self, name, url, open_ai):
+        load_dotenv()
+        self.credentials = {
+            'user': os.getenv('WP_USERNAME'),
+            'pass': os.getenv('WP_APP_PW'),
+            'site': os.getenv('WP_PATH')
+        }
         self.open_ai = open_ai
         self.name = name
         self.url = url
@@ -57,23 +64,23 @@ class AutoPress():
                 image_title = ''
                 image_caption = ''
                 image_desc = ''
-                image_src = req.get(f"https://{self.url}/wp-json/wp/v2/media/{article['featured_media']}")
-                print(image_src)
-                if image_src.status_code == 200:
-                    image_json = image_src.json()
+                image_src_id = req.get(f"https://{self.url}/wp-json/wp/v2/media/{article['featured_media']}")
+                print(image_src_id)
+                if image_src_id.status_code == 200:
+                    image_json = image_src_id.json()
                     print(image_json)
                     image_title = image_json['title']['rendered']
                     image_caption = image_json['caption']['rendered']
-                    image_desc - image_json['description']['rendered']
+                    image_desc = image_json['alt_text']
 
                 article_arr = ({
                     "id": article['id'],
                     "name": html.unescape(article['title']['rendered']),
                     "date": article['date_gmt'],
                     "media": article['featured_media_global']['source_url'],
-                    "image_title": image_title
+                    "image_title": image_title,
                     "image_caption": image_caption,
-                    "image_desc": image_description
+                    "image_desc": image_desc,
                     "content": self.render_html_to_plain_text(article['content']['rendered'])
                 })
 
@@ -102,9 +109,15 @@ class AutoPress():
 
         for article in file_data:
             if article['id'] not in existing_ids:
-                #generated_article = self.open_ai.send_prompt(article)
-                #parsed_article = json.loads(generated_article)
+                #Send artikel til img func
+                #Modtag billede her evt som image_web_p
+                WordPress.image_decision(self, self.open_ai, article)
 
+                return
+
+
+                generated_article = self.open_ai.send_prompt(article)
+                parsed_article = json.loads(generated_article)
 
                 
                 self.webp_image_gen = image_webp

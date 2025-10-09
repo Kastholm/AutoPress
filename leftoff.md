@@ -1,2 +1,1 @@
-Læs i wordpress filen.
-Decision og generering af billede
+Billede logik er næsten done, men der er problem ift self og anvendelse af apply_img function
