@@ -1,0 +1,1 @@
+Billede logik er næsten done, men der er problem ift self og anvendelse af apply_img function

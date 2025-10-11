@@ -11,16 +11,16 @@ Du er en erfaren dansk journalist.
 Omskriv artiklen fuldstændigt med ny vinkel, ny struktur og i andre ord, men behold fakta.  
 Teksten skal:  
 - Være på dansk.  
-- Maks. 500 ord.  
+- Minimum 500 ord.  
 - Have en fængende titel og teaser, der giver læseren lyst til at klikke.  
 - Ikke starte artiklen med "I en...".  
 - Indeholde maks. 2 citater (citater må ikke omskrives).  
 - Være skrevet i journalistisk stil: objektiv, letlæselig, aktivt sprog.  
-- Undgå gentagelser og fyldord.  
+- Undgå gentagelser og fyldord.
 - Byg artiklen op med tydelig rubrik (title), kort teaser og indhold i HTML-format klar til WordPress.
 - Tildel en meningsfuld kategori blandt Nyheder, Udland, 112(omhanlder politisager i Danmark), Sundhed, hvis ingen kategorier 
   passer til artiklen, tildel en anden passende kategori.
-- Tildel mellem 1 og 3 relevante og fyldige tags til denne tekst. Anvend kun meget brede tags.
+- Tildel mellem 1 og 3 relevante og fyldige tags til denne tekst med stort forbogstav. Anvend kun meget brede tags som fx Trafik, Færdselsregler, Medicin, Sociale Medier, osv.
 - Returnér resultatet i følgende JSON-struktur, kun objektet, intet andet:
 
 {
@@ -29,12 +29,9 @@ Teksten skal:
   "teaser": "Artiklens teaser",
   "content": "<p>Artiklens indhold i HTML</p>",
   "image_url": "eksisterende img url",
-  "image_prompt": "Prompt til at generere et billede til artiklen",
-  "image_title": "Titel det genererede billede",
-  "image_desc": "Beskrivelse af hvad billedet indeholder",
   "categories": "Artiklens kategori",
   "categories_desc": "Kategori beskrivelse",
-  "tags: "Artiklens tags"
+  "tags: "Artiklens tags",
 }
 """
 
@@ -50,11 +47,11 @@ class ChatGPT:
         else:
             print("None or not usable API key provided")
 
-    def send_prompt(self, prompt):
+    def send_prompt(self, prompt, instructions=instructions, version='gpt-5-mini'):
         if self.client:
             try:
                 response = self.client.responses.create(
-                    model='gpt-4o-mini',
+                    model=version,
                     instructions=instructions,
                     input=f'{prompt}',
                 )
@@ -67,7 +64,7 @@ class ChatGPT:
         
         return response
 
-    def generate_image(self, title, img, prompt):
+    def generate_img(self, title, img):
 
         if self.client:
             try:
@@ -75,6 +72,7 @@ class ChatGPT:
                 content_type = img_content.headers.get("Content-Type")
                 img_data = requests.get(img).content
                 img_base64 = base64.b64encode(img_data).decode("utf-8")
+                
                 response = self.client.responses.create(
                     model='gpt-4.1',
                     input=[
@@ -82,10 +80,9 @@ class ChatGPT:
                         "role": "user",
                         "content": [
                             {"type": "input_text", "text": f""" 
-                            Generer et billede der passer til denne artikel:
-                            {title}.
-
-                            Se vedhæftede billede for at se originale billede til artiklen.
+                            Tag dette vedhæftede billede og lav det 40% om. Så det ligner originalen, men har en lille variation.
+                            Det skal størrelsesmæssigt passe til en artikel.
+                            Hvis billedet indeholder et logo eller varemærke må selve dette ikke ændres, så skal ting som baggrunden eller andre detaljer ændres for at skabe variation.
                             """},
                             {
                                 "type": "input_image",
@@ -94,7 +91,7 @@ class ChatGPT:
                         ],
                       }
                     ],
-                    tools=[{"type": "image_generation", "quality": "low"}],
+                    tools=[{"type": "image_generation", "quality": "high"}],
                 )
                 image_generation_calls = [
                     output
@@ -106,9 +103,19 @@ class ChatGPT:
 
                 if image_data:
                     image_base64 = image_data[0]
-                    with open("gift-basket.webp", "wb") as f:
-                        f.write(base64.b64decode(image_base64))
-                    return base64.b64decode(image_base64)
+                    #with open("gift-basket.webp", "wb") as f:
+                    #    f.write(base64.b64decode(image_base64))
+                    
+                    image_bytes = base64.b64decode(image_base64)
+
+                    pil_image = Image.open(BytesIO(image_bytes))
+
+                    output = BytesIO()
+                    pil_image.save(output, format="WEBP", quality=80)
+                    webp_bytes = output.getvalue()
+
+                    return webp_bytes
+
                 else:
                     print(response.output.content)
             except Exception as e:
@@ -148,22 +155,27 @@ class ChatGPT:
 
         return webp_bytes
 
-    def gen_img_three(self, title, img):
+    def generate_img_three(self, title, img):
         r = requests.get(img)
         print(r.status_code, r.headers.get("Content-Type"))
+        buf = BytesIO(r.content); 
+        buf.name = "source.jpg"
+        f = self.client.files.create(file=buf, purpose="vision")
+
         response = self.client.responses.create(
             model="gpt-5",
             input = f"""
-            Skab et fotorealistisk billede, der passer til denne artikel:
-            "{title}"
-
-            Brug det vedhæftede billede som reference for komposition, lys og stemning. 
-            Det nye billede må gerne ligne det originale op til 90%.
-            Link til originale billede: {img}
-            
-            Undgå al tekst, logoer og vandmærker på billedet.
+            Tag dette {img} og lav (40%) om. Så det ligner originalen, men har en lille variation
             """,
-            tools=[{"type": "image_generation"}],
+            tools=[{
+                "type": "image_generation",
+                "image_generation": {
+                    "prompt": "Subtil variation af fotoet",
+                    "referenced_image_ids": [f.id],
+                    "size": "1024x1024",
+                    "n": 1
+                }
+            }],
         )
 
         # Save the image to a file
@@ -175,5 +187,15 @@ class ChatGPT:
             
         if image_data:
             image_base64 = image_data[0]
+            image_bytes = base64.b64decode(image_base64)
+            pil_image = Image.open(BytesIO(image_bytes))
+
+            output = BytesIO()
+            pil_image.save(output, format="WEBP", quality=80)
+            webp_bytes = output.getvalue()
+
             with open("otter.png", "wb") as f:
                 f.write(base64.b64decode(image_base64))
+            return webp_bytes
+        
+        return None
