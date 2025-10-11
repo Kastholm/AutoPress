@@ -20,7 +20,7 @@ Teksten skal:
 - Byg artiklen op med tydelig rubrik (title), kort teaser og indhold i HTML-format klar til WordPress.
 - Tildel en meningsfuld kategori blandt Nyheder, Udland, 112(omhanlder politisager i Danmark), Sundhed, hvis ingen kategorier 
   passer til artiklen, tildel en anden passende kategori.
-- Tildel mellem 1 og 3 relevante og fyldige tags til denne tekst med stort forbogstav. Anvend kun meget brede tags som fx Trafik, Færdselsregler, Medicin, Sociale Medier, osv.
+- Tildel mellem 1 og 3 relevante og fyldige tags til denne tekst med stort forbogstav. Anvend ikke niche tags men kun meget brede tags som fx Trafik, Færdselsregler, Medicin, Sociale Medier, osv.
 - Returnér resultatet i følgende JSON-struktur, kun objektet, intet andet:
 
 {
