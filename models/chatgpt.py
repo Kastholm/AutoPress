@@ -11,7 +11,7 @@ Du er en erfaren dansk journalist.
 Omskriv artiklen fuldstændigt med ny vinkel, ny struktur og i andre ord, men behold fakta.  
 Teksten skal:  
 - Være på dansk.  
-- Maks. 500 ord.  
+- Minimum 500 ord.  
 - Have en fængende titel og teaser, der giver læseren lyst til at klikke.  
 - Ikke starte artiklen med "I en...".  
 - Indeholde maks. 2 citater (citater må ikke omskrives).  
@@ -20,7 +20,7 @@ Teksten skal:
 - Byg artiklen op med tydelig rubrik (title), kort teaser og indhold i HTML-format klar til WordPress.
 - Tildel en meningsfuld kategori blandt Nyheder, Udland, 112(omhanlder politisager i Danmark), Sundhed, hvis ingen kategorier 
   passer til artiklen, tildel en anden passende kategori.
-- Tildel mellem 1 og 3 relevante og fyldige tags til denne tekst. Anvend kun meget brede tags.
+- Tildel mellem 1 og 3 relevante og fyldige tags til denne tekst med stort forbogstav. Anvend kun meget brede tags som fx Trafik, Færdselsregler, Medicin, Sociale Medier, osv.
 - Returnér resultatet i følgende JSON-struktur, kun objektet, intet andet:
 
 {
@@ -103,8 +103,8 @@ class ChatGPT:
 
                 if image_data:
                     image_base64 = image_data[0]
-                    with open("gift-basket.webp", "wb") as f:
-                        f.write(base64.b64decode(image_base64))
+                    #with open("gift-basket.webp", "wb") as f:
+                    #    f.write(base64.b64decode(image_base64))
                     
                     image_bytes = base64.b64decode(image_base64)
 
