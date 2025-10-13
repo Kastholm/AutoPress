@@ -258,8 +258,11 @@ class WordPress:
         for new_article in articles:
             log(f' Preparing metadata for post {new_article["title"]}', 'h1')
 
-
-            category_id = self.apply_category(new_article, log)
+            if new_article['categories']:
+                category_id = self.apply_category(new_article, log)
+            else:
+                category_id = ''
+                
             if new_article['tags']:
                 tag_ids = self.apply_tags(new_article, log)
             else:
