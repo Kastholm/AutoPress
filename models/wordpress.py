@@ -138,7 +138,6 @@ class WordPress:
         
         if r.status_code == 201:
             data = r.json()
-            log(f' 🔍 Image data requested for post {new_article["title"]}: {data}', 'h4')
             
             media_id = data["id"]
             log(f' ✅ Image id for post {new_article["title"]}: {media_id}', 'h4')
@@ -191,7 +190,7 @@ class WordPress:
         }}
         """
 
-        whitelist_response = open_ai.send_prompt(prompt, instructions, version='gpt-5-nano', log)
+        whitelist_response = open_ai.send_prompt(prompt, log, instructions, version='gpt-5-nano')
         ai_whitelist_response = json.loads(whitelist_response)
         log(f' 🔍 Image decision for post {new_article["title"]} response: {ai_whitelist_response}', 'h3')
         #Convert the none licensed image to webp and return it
@@ -231,7 +230,7 @@ class WordPress:
                     "reason": "kort forklaring hvis et billede er valgt"
                 }} 
                 """
-                database_img_response = open_ai.send_prompt(prompt, instructions, version='gpt-5-nano', log)
+                database_img_response = open_ai.send_prompt(prompt, log, instructions, version='gpt-5-nano')
                 database_img_response_json = json.loads(database_img_response)
                 log(f' 🔍 Database image response for post {new_article["title"]}: {database_img_response_json}', 'h3')
                 #If an image is found, return it

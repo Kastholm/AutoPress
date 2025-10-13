@@ -20,7 +20,7 @@ class AutoPress():
         self.eligible_posts_arr = []
         self.posts_to_publish = []
         self.img_id = ''
-        self.testing_mode = True
+        self.testing_mode = False
         self.log(f'{"⛔ Starting in testing mode" if self.testing_mode else " ✅ Starting in production mode"}', 'h1')
         self.fetch_compare_articles()
         self.generate_new_articles()
@@ -147,6 +147,7 @@ class AutoPress():
                     parsed_article = generated_article
                     #----- Test ----- 
                 else:
+                    #return None
                     generated_article = self.open_ai.send_prompt(article, self.log)
                     self.img_id = self.wordpress.image_decision(self.open_ai, article, self.log)
                     parsed_article = json.loads(generated_article)
@@ -158,7 +159,7 @@ class AutoPress():
                 with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
                     json.dump(gen_articles, f, indent=4, ensure_ascii=False)
             else:
-                self.log(f' 🔍 Article {article["title"]["rendered"]} already generated', 'h1')
+                self.log(f' 🔍 Article {article["title"]} already generated', 'h1')
 
 
     def publish_articles(self):

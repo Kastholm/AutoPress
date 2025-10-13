@@ -24,7 +24,7 @@ Teksten skal:
 - Returnér resultatet i følgende JSON-struktur, kun objektet, intet andet:
 
 {
-  "id": "Artiklens oprindelig ID",
+  "id": Artiklens oprindelig ID,
   "title": "Artiklens titel",
   "teaser": "Artiklens teaser",
   "content": "<p>Artiklens indhold i HTML</p>",
@@ -47,7 +47,7 @@ class ChatGPT:
         else:
             print("None or not usable API key provided")
 
-    def send_prompt(self, prompt, instructions=instructions, version='gpt-5-mini', log):
+    def send_prompt(self, prompt, log, instructions=instructions, version='gpt-5-mini'):
         if self.client:
             try:
                 response = self.client.responses.create(
