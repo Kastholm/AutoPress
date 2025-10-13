@@ -260,7 +260,10 @@ class WordPress:
 
 
             category_id = self.apply_category(new_article, log)
-            tag_ids = self.apply_tags(new_article, log)
+            if new_article['tags']:
+                tag_ids = self.apply_tags(new_article, log)
+            else:
+                tag_ids = ''
             
             # Skip posting if image upload failed
             if img_id is None:
