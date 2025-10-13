@@ -242,7 +242,6 @@ class WordPress:
                     return None
 
         #Generate an image with AI and return it as webp
-        log(f' 🟢 AI generating new image for post {new_article["title"]}', 'h2')
         image_webp_bytes = open_ai.generate_img(
             new_article['title'], new_article['media'], log
         )

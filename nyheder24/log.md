@@ -96,3 +96,51 @@
 ####  ✅ Image 130781 found in WordPress
 #  🔍 Article ”Putin er en desperat rotte”: amerikansk kongresmedlem langer ud efter tropper nær Estland already generated
 # ❌ No new posts to post ❌
+#  ✅ Starting in production mode
+# 🟢 Fetching articles from WordPress
+## ✅ Fetched articles from WordPress sucessfully
+###  🔍 Reading article Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand from WordPress
+###  🔍 Reading image 130792 from WordPress
+####  ✅ Image 130792 found in WordPress
+###  🔍 Article Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand not in JSON file, adding to eligible posts array
+#  🔍 Article ”Putin er en desperat rotte”: amerikansk kongresmedlem langer ud efter tropper nær Estland already generated
+#  🟢 Generating new article Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand
+##  🔍 Prompt Success: {
+  "id": 130783,
+  "title": "Overfladet russisk ubåd i NATO-farvand skærper fokus på Atlanten",
+  "teaser": "En fransk fregat sporede en russisk ubåd ud for Bretagne. Observationen, der ifølge NATO skete under rutinemæssig overvågning, understreger alliancens årvågenhed og russernes evne til at projicere magt til havs.",
+  "content": "<h2>Hændelsen</h2>\n<p>En russisk ubåd kom op til overfladen ud for Bretagnes kyst, og en fransk fregat blev sendt til området for at spore fartøjet, oplyser NATO. Observationen fandt sted under alliancens almindelige overvågning af maritime indsejlinger og udløste en hurtig reaktion fra forbindelseleddet i regionen.</p>\n\n<h2>Alliancens respons</h2>\n<p>NATO betonede, at patruljer og maritim tilstedeværelse i Nordatlanten er kontinuerlig. \"Alliancen er klar til at forsvare hele det atlantiske område.\" Kort efter gentog alliancens maritime kommando med endnu en klar erklæring: \"NATO er klar til at forsvare vores alliance med konstant årvågenhed og maritim tilstedeværelse over hele Atlanten,\" som led i beroligelsen af medlemslandenes kystvagter og civile myndigheder.</p>\n\n<h2>Hvilket skib var det?</h2>\n<p>Ifølge militære observatører og UK Defence Journal menes det at være den russiske diesel-elektriske ubåd Novorossiisk (B-261). Fartøjet tilhører Sortehavsflåden og klassificeres som en Project 636.3 (Kilo II)-klasse angrebsubåd — en type der er kendt for lav støjprofilet og alsidige våbenløsninger.</p>\n\n<h2>Tekniske detaljer og kapacitet</h2>\n<p>Novorossiisk blev søsat i 2013 og indsat i tjeneste i 2014 efter byggeri på Admiralitetsværftet i Sankt Petersborg. Ubåden er cirka 74 meter lang med en undervandsforskydning omkring 3.100 ton. Den kan forblive neddykket op til cirka 45 dage og dykke ned til omtrent 300 meters dybde.</p>\n<p>Fartøjets offensive evner omfatter seks 533 mm torpedorør, der kan affyre torpedoer, lægge miner eller affyre Kalibr-krydsermissiler — en kapacitet Rusland har brugt i operationer uden for egne farvande. Disse egenskaber gør Novorossiisk til et centralt instrument i Moskvas maritime strategi.</p>\n\n<h2>Strategisk rækkevidde og tidligere operationer</h2>\n<p>Novorossiisk har tidligere opereret i Middelhavet som en del af den russiske Middelhavsgruppe, hvor den har støttet operationer i Syrien. Fartøjets rækkevidde og bevægelighed illustrerer, hvordan russiske ubåde bevæger sig langt ud over Sortehavet for at understøtte udenlandske operationer og demonstrere tilstedeværelse.</p>\n<p>Et tidligere stop i Ceuta i 2015 skabte diplomatiske rystelser, fordi anløbet lå tæt på Gibraltar og vakte bekymring hos britiske embedsmænd om russisk nærværsstrategi i strategiske søveje.</p>\n\n<h2>Påstande om tekniske problemer</h2>\n<p>Senere rygter på russiske sociale medier om et brændstoflæk på Novorossiisk er blevet omtalt i medier, men UK Defence Journal har ikke kunnet bekræfte skaden. Det russiske forsvarsministerium benægtede mandag, at ubåden havde tekniske problemer i forbindelse med frembruddet nær den franske kyst.</p>\n\n<h2>Kontekst: Øget ubådsaktivitet</h2>\n<p>Hændelsen kommer i kølvandet på øget russisk ubådsaktivitet. For få uger siden deltog den atomdrevne ubåd Arkhangelsk i øvelsen Zapad-2025, hvor det russiske forsvarsministerium oplyste, at den simulerede affyring af Kalibr-missiler i Barentshavet. Tilsammen peger sådanne bevægelser på en strategisk prioritering fra Moskva — under havets overflade såvel som på den.</p>\n\n<h2>Hvorfor det betyder noget</h2>\n<p>Overfladninger og patruljer tæt på NATO-område fungerer både som overvågningsinformation og som signalpolitik. For NATO rejser de spørgsmål om beredskab, informationsdeling og evnen til at reagere hurtigt i sårbare maritime korridorer. For Rusland er ubådene et middel til at projicere magt og opretholde tilstedeværelse i strategiske oceanområder.</p>\n\n<h2>Efterspil</h2>\n<p>Der er ikke rapporteret om konfrontationer eller skader i forbindelse med observationen. Alliancens fortsatte patruljer og udveksling mellem flådemyndigheder forbliver central for at reducere risikoen for misforståelser og forhindre utilsigtet eskalation i Nordatlanten.</p>",
+  "image_url": "https://media.mgdk.dk/wp-content/uploads/sites/2/2025/06/shutterstock_1690106482.jpg",
+  "categories": "Udland",
+  "categories_desc": "Dækker internationale begivenheder, sikkerhedspolitik og udenrigsanliggender.",
+  "tags": [
+    "Forsvar",
+    "Sikkerhed"
+  ]
+}
+##  🟢🟢 Image decision for post Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand
+##  🔍 Prompt Success: {
+  "License": false,
+  "Reason": "Billedet ser ud til at være et Shutterstock-stockfoto (baseret på filnavn og kilde). Shutterstock-indhold er ikke licensfrit og kræver køb af licens for brug i artiklen.",
+  "Searchword": "Ubåd"
+}
+###  🔍 Image decision for post Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand response: {'License': False, 'Reason': 'Billedet ser ud til at være et Shutterstock-stockfoto (baseret på filnavn og kilde). Shutterstock-indhold er ikke licensfrit og kræver køb af licens for brug i artiklen.', 'Searchword': 'Ubåd'}
+###  🔍 Searching for images with searchword: ubad
+##  🟢 AI generating new image for post Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand
+##  🔍 AI Generating image for post Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand
+##  ✅ Success AI Generated image for post Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand
+####  ✅ Image id for post Russisk ubåd, der kan bære krydsermissiler, set i NATO-farvand: 227
+####  Image metadata update status: 200
+#  Preparing metadata for post Overfladet russisk ubåd i NATO-farvand skærper fokus på Atlanten
+# ✅ AUTH Connection to new site opdateret.dk/categories sucess
+## 🔍 Checking if category Nyheder exists in the database
+## 🔍 Checking if category Sundhed exists in the database
+## 🔍 Checking if category Udland exists in the database
+### ✅ Category Udland found in the database, returning category id
+##  🟢 Applying tags to post ['Forsvar', 'Sikkerhed']
+###  🔍 Checking if tag Forsvar exists in the database
+####  ✅ Tag Forsvar found in the database, returning tag id
+###  🔍 Checking if tag Sikkerhed exists in the database
+####  ✅ Tag Sikkerhed found in the database, returning tag id
+#  Ready article metadata for post Overfladet russisk ubåd i NATO-farvand skærper fokus på Atlanten
+# ✅ Post Overfladet russisk ubåd i NATO-farvand skærper fokus på Atlanten published to WordPress sucessfully
