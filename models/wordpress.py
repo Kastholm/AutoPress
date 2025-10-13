@@ -171,13 +171,12 @@ class WordPress:
 
         Alt i alt, skal du vurdere om dette billede er licensfrit og om vi kan benytte det til vores artikel.
 
-        Det originale billede kan du se her hvis det hjælper dig med din vurdering:
-        {new_article['media']}
-
         Vi skal bruge et dansk søgeord ud fra titlen {new_article['image_title']}.
         F.eks hvis titlen er 'Edderkop kravler hen af gulvet' skal søgeordet bare være Edderkop.
         Hvis artiklen omhandler en privatperson hvor billedegenerering ikke er tilladt, som fx 'Jonas Vingegaard',
         skal søgeordet være noget som fx 'Cykelrytter', 'Tour de France'. 
+
+        Hvis ingen caption, er License automatisk False
 
         Du skal returnere i dette JSON format ud fra om det er licensfrit eller ikke.
         False = Ikke Licensfrit
@@ -262,7 +261,7 @@ class WordPress:
                 category_id = self.apply_category(new_article, log)
             else:
                 category_id = ''
-                
+
             if new_article['tags']:
                 tag_ids = self.apply_tags(new_article, log)
             else:
