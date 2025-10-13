@@ -47,7 +47,7 @@ class ChatGPT:
         else:
             print("None or not usable API key provided")
 
-    def send_prompt(self, prompt, instructions=instructions, version='gpt-5-mini'):
+    def send_prompt(self, prompt, instructions=instructions, version='gpt-5-mini', log):
         if self.client:
             try:
                 response = self.client.responses.create(
@@ -56,18 +56,20 @@ class ChatGPT:
                     input=f'{prompt}',
                 )
                 response = response.output_text
+                log(f' 🔍 Prompt Success: {response}', 'h2')
             except Exception as e:
-                print(f"Error: {e}")
+                log(f"Prompt Error: {e}", 'h2')
         else:
             response = ''
-            print("No client available")
+            log("No client available", 'h2')
         
         return response
 
-    def generate_img(self, title, img):
+    def generate_img(self, title, img, log):
 
         if self.client:
             try:
+                log(f' 🔍 AI Generating image for post {title}', 'h2')
                 img_content = requests.get(img)
                 content_type = img_content.headers.get("Content-Type")
                 img_data = requests.get(img).content
@@ -103,6 +105,7 @@ class ChatGPT:
 
                 if image_data:
                     image_base64 = image_data[0]
+                    log(f' ✅ Success AI Generated image for post {title}', 'h2')
                     #with open("gift-basket.webp", "wb") as f:
                     #    f.write(base64.b64decode(image_base64))
                     
@@ -117,9 +120,9 @@ class ChatGPT:
                     return webp_bytes
 
                 else:
-                    print(response.output.content)
+                    log(f' ❌ Error AI Generated image for post {title}', 'h2')
             except Exception as e:
-                print(e)
+                log(f' ❌ Reason Error AI Generated image for post {e}', 'h2')
                 
         return None
 
