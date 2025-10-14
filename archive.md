@@ -1,4 +1,4 @@
-    def generate_img_two(self, title, img, prompt):
+   def generate_img_two(self, title, img, prompt):
         r = requests.get(img)
         print(r.status_code, r.headers.get("Content-Type"))
         result = self.client.images.generate(

@@ -26,6 +26,10 @@ ___
 
 # Problemstillinger.
 - Billeder af rigtige personer, hvor ret ikke haves til at oprette billeder af dem.
+    - Kan løses ved at optimere img prompt
+- Timer
+- Filer med prompts
+- Ryd op i log meddelser
     - `Kan løses ved at optimere img prompt`
     - asdfasdf
     - - - - `asdf`
