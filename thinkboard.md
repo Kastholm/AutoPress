@@ -30,3 +30,7 @@ ___
 - Timer
 - Filer med prompts
 - Ryd op i log meddelser
+    - `Kan løses ved at optimere img prompt`
+    - asdfasdf
+    - - - - `asdf`
+    # 1. test

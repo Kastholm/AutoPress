@@ -74,6 +74,3 @@
             return webp_bytes
         
         return None
-
-
-

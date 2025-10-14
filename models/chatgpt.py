@@ -49,6 +49,7 @@ class ChatGPT:
 
     def send_prompt(self, prompt, log, instructions=instructions, version='gpt-5-mini'):
         if self.client:
+            log(f'🔍🟢 OpenAI Client found', 'list')
             try:
                 response = self.client.responses.create(
                     model=version,
@@ -56,12 +57,12 @@ class ChatGPT:
                     input=f'{prompt}',
                 )
                 response = response.output_text
-                log(f' 🔍 Prompt Success: {response}', 'h2')
+                log(f'🔍✅ Client found and prompt success: {response}', 'list')
             except Exception as e:
-                log(f"Prompt Error: {e}", 'h2')
+                log(f"❌ Prompt Error: {e}", 'list')
         else:
             response = ''
-            log("No client available", 'h2')
+            log("❌ No client available - API key not found", 'list')
         
         return response
 
@@ -69,7 +70,7 @@ class ChatGPT:
 
         if self.client:
             try:
-                log(f' 🔍 AI Generating image for post {title}', 'h2')
+                log(f'🔍 AI Generating image for post {title}', 'list')
                 img_content = requests.get(img)
                 content_type = img_content.headers.get("Content-Type")
                 img_data = requests.get(img).content
@@ -105,7 +106,7 @@ class ChatGPT:
 
                 if image_data:
                     image_base64 = image_data[0]
-                    log(f' ✅ Success AI Generated image for post {title}', 'h2')
+                    log(f'✅ Success AI Generated image for post {title}', 'list')
                     #with open("gift-basket.webp", "wb") as f:
                     #    f.write(base64.b64decode(image_base64))
                     
@@ -120,8 +121,8 @@ class ChatGPT:
                     return webp_bytes
 
                 else:
-                    log(f' ❌ Error AI Generated image for post {title}', 'h2')
+                    log(f' ❌ Error AI Generated image for post {title}', 'list')
             except Exception as e:
-                log(f' ❌ Reason Error AI Generated image for post {e}', 'h2')
+                log(f' ❌ Reason Error AI Generated image for post {e}', 'list')
                 
         return None
