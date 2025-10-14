@@ -259,6 +259,11 @@ class WordPress:
             log(f'🔍 Preparing metadata for post {articles[0]["title"]}', 'h2')
 
         for new_article in articles:
+            # Skip posting if image upload failed
+            if img_id is None:
+                log('❌ Skipping post due to failed image upload ❌', 'list')
+                continue
+            
             if new_article['categories']:
                 category_id = self.apply_category(new_article, log)
             else:
@@ -269,10 +274,6 @@ class WordPress:
             else:
                 tag_ids = ''
             
-            # Skip posting if image upload failed
-            if img_id is None:
-                log('❌ Skipping post due to failed image upload ❌', 'list')
-                continue
 
             
             #TODO tilvælg en random journalist
