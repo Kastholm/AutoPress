@@ -6,7 +6,7 @@ from io import BytesIO
 from PIL import Image
 from dotenv import load_dotenv
 from openai import OpenAI
-#TODO Hvis artikler omhandler nogen specifikke ting, bed ChatGPT om returnere en tom artikel []
+
 instructions = """
 Du er en erfaren dansk journalist.  
 Omskriv artiklen fuldstændigt med ny vinkel, ny struktur og i andre ord, men behold fakta.  
@@ -34,6 +34,12 @@ Teksten skal:
   "categories_desc": "Kategori beskrivelse",
   "tags: "Artiklens tags",
 }
+"""
+
+Image_prompt = """
+Tag dette vedhæftede billede og lav det 40% om. Så det ligner originalen, men har en lille variation.
+Det skal størrelsesmæssigt passe til en artikel.
+Hvis billedet indeholder et logo eller varemærke må selve dette ikke ændres, så skal ting som baggrunden eller andre detaljer ændres for at skabe variation.
 """
 class ChatGPT:
 
@@ -85,9 +91,7 @@ class ChatGPT:
                         "role": "user",
                         "content": [
                             {"type": "input_text", "text": f""" 
-                            Tag dette vedhæftede billede og lav det 40% om. Så det ligner originalen, men har en lille variation.
-                            Det skal størrelsesmæssigt passe til en artikel.
-                            Hvis billedet indeholder et logo eller varemærke må selve dette ikke ændres, så skal ting som baggrunden eller andre detaljer ændres for at skabe variation.
+                            {Image_prompt}
                             """},
                             {
                                 "type": "input_image",
