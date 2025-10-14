@@ -41,8 +41,8 @@ class AutoPress():
         elif text_type == 'list':
             text_type = f'- {log_content}'
 
-        if not os.path.exists(pages/self.name):
-            os.makedirs(pages/self.name)
+        if not os.path.exists(pages/{self.name}):
+            os.makedirs(pages/{self.name})
         if not os.path.exists(f'pages/{self.name}/log.md'):
             with open(f'pages/{self.name}/log.md', 'w') as f:
                 f.write('')
@@ -55,16 +55,11 @@ class AutoPress():
             os.makedirs(pages/self.name)
         if not os.path.exists(f'pages/{self.name}/articles.json'):
             with open(f'pages/{self.name}/articles.json', 'w') as f:
-        if not os.path.exists(f'pages/{self.name}/articles.json'):
-            with open(f'pages/{self.name}/articles.json', 'w') as f:
                 json.dump([], f)
-        if not os.path.exists(f'pages/{self.name}/gen_articles.json'):
-            with open(f'pages/{self.name}/gen_articles.json', 'w') as f:
         if not os.path.exists(f'pages/{self.name}/gen_articles.json'):
             with open(f'pages/{self.name}/gen_articles.json', 'w') as f:
                 json.dump([], f)
         
-        with open(f'pages/{self.name}/articles.json', 'r', encoding='utf-8') as f:
         with open(f'pages/{self.name}/articles.json', 'r', encoding='utf-8') as f:
             json_data = json.load(f)
         
@@ -122,7 +117,6 @@ class AutoPress():
     
     def generate_new_articles(self):
         file_data = self.generate_load_files()
-        with open(f'pages/{self.name}/gen_articles.json', 'r', encoding='utf-8') as f:
         with open(f'pages/{self.name}/gen_articles.json', 'r', encoding='utf-8') as f:
             gen_articles = json.load(f)
 
