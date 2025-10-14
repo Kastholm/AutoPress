@@ -1,6 +1,7 @@
 import os
 import base64
 import requests
+import time
 from io import BytesIO
 from PIL import Image
 from dotenv import load_dotenv
@@ -34,7 +35,6 @@ Teksten skal:
   "tags: "Artiklens tags",
 }
 """
-
 class ChatGPT:
 
     def __init__(self):
@@ -48,8 +48,9 @@ class ChatGPT:
             print("None or not usable API key provided")
 
     def send_prompt(self, prompt, log, instructions=instructions, version='gpt-5-mini'):
+        start_timer = time.time()
         if self.client:
-            log(f'🔍🟢 OpenAI Client found', 'list')
+            log(f'🔍🟢 OpenAI Client found, strting prompt...', 'list')
             try:
                 response = self.client.responses.create(
                     model=version,
@@ -57,17 +58,18 @@ class ChatGPT:
                     input=f'{prompt}',
                 )
                 response = response.output_text
-                log(f'🔍✅ Client found and prompt success: {response}', 'list')
+                log(f'🔍✅ Client found and prompt success', 'list')
             except Exception as e:
                 log(f"❌ Prompt Error: {e}", 'list')
         else:
             response = ''
             log("❌ No client available - API key not found", 'list')
-        
+        end_timer = time.time()
+        log(f'🕒 {round(end_timer-start_timer, 2)} sec to complete AI TextPrompt', 'list')
         return response
 
     def generate_img(self, title, img, log):
-
+        start_timer = time.time()
         if self.client:
             try:
                 log(f'🔍 AI Generating image for post {title}', 'list')
@@ -117,7 +119,8 @@ class ChatGPT:
                     output = BytesIO()
                     pil_image.save(output, format="WEBP", quality=80)
                     webp_bytes = output.getvalue()
-
+                    end_timer = time.time()
+                    log(f'🕒 {round(end_timer-start_timer, 2)} sec to complete AI Image Generation', 'list')
                     return webp_bytes
 
                 else:

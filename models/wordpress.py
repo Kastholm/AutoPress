@@ -122,7 +122,7 @@ class WordPress:
 
             return apply_tag_ids_arr
 
-    def upload_and_convert_img(self, new_article, webp_bytes, caption, log):
+    def upload_and_convert_img(self, new_article, webp_bytes, caption, image_description, log):
         log(f'🔍 Uploading image for post {new_article["id"]}', 'h2')
         lib_url = f'https://{self.credentials["site"]}/wp-json/wp/v2/media'
 
@@ -143,7 +143,7 @@ class WordPress:
             # Update image metadata
             update_response = requests.post(
                 f"{lib_url}/{media_id}",
-                json={"alt_text": new_article['image_desc'], "caption": caption},
+                json={"alt_text": image_description, "caption": caption},
                 auth=HTTPBasicAuth(self.credentials['user'], self.credentials['pass']),
                 headers={"Content-Type": "application/json"}
             )
@@ -172,7 +172,10 @@ class WordPress:
         Vi skal bruge et dansk søgeord ud fra titlen {new_article['image_title']}.
         F.eks hvis titlen er 'Edderkop kravler hen af gulvet' skal søgeordet bare være Edderkop.
         Hvis artiklen omhandler en privatperson hvor billedegenerering ikke er tilladt, som fx 'Jonas Vingegaard',
-        skal søgeordet være noget som fx 'Cykelrytter', 'Tour de France'. 
+        skal søgeordet være noget som fx 'Cykelrytter', 'Tour de France'.
+
+        Oversæt til dansk og skriv en billedebeskrivelse ud fra denne beskrivelse: {new_article['image_desc']}.
+        Den skal indeholde søgeord som er relevante for artiklen og billedet.
 
         Hvis ingen caption, er License automatisk False
 
@@ -183,7 +186,8 @@ class WordPress:
         {{
             "License": bool,
             "Reason": string,
-            "Searchword": string
+            "Searchword": string,
+            "image_description": string
         }}
         """
 
@@ -196,7 +200,7 @@ class WordPress:
             output = BytesIO()
             img.convert("RGB").save(output, format="WEBP", quality=80)
             image_webp_bytes = output.getvalue()
-            img_id = self.upload_and_convert_img(new_article, image_webp_bytes, new_article['image_caption'], log)
+            img_id = self.upload_and_convert_img(new_article, image_webp_bytes, new_article['image_caption'], ai_whitelist_response['image_description'], log)
             return img_id
         else:
             #If no licensed image is found, search the database for a matching image
@@ -243,7 +247,7 @@ class WordPress:
             new_article['title'], new_article['media'], log
         )
         ##Upload the image to the database and return the id
-        img_id = self.upload_and_convert_img(new_article, image_webp_bytes, 'AI Genereret', log)
+        img_id = self.upload_and_convert_img(new_article, image_webp_bytes, 'AI Genereret', ai_whitelist_response['image_description'], log)
         return img_id
                 
 
