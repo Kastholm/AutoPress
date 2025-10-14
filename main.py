@@ -51,8 +51,8 @@ class AutoPress():
             f.write(f'{text_type}\n')
 
     def generate_load_files(self):
-        if not os.path.exists(self.name):
-            os.makedirs(self.name)
+        if not os.path.exists(pages/self.name):
+            os.makedirs(pages/self.name)
         if not os.path.exists(f'pages/{self.name}/articles.json'):
             with open(f'pages/{self.name}/articles.json', 'w') as f:
         if not os.path.exists(f'pages/{self.name}/articles.json'):
