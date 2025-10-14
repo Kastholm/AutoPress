@@ -35,6 +35,12 @@ Teksten skal:
   "tags: "Artiklens tags",
 }
 """
+Image_prompt = """
+Tag dette vedhæftede billede og lav det 40% om. Så det ligner originalen, men har en lille variation.
+Det skal størrelsesmæssigt passe til en artikel.
+Hvis billedet indeholder et logo eller varemærke må selve dette ikke ændres, så skal ting som baggrunden eller andre detaljer ændres for at skabe variation.
+Hvis artiklen omhandler en privatperson hvor billedegenerering ikke er tilladt, som fx 'Jonas Vingegaard', skal der genereres et billede af fx 'Cykelrytter', 'Tour de France'.
+"""
 class ChatGPT:
 
     def __init__(self):
@@ -85,9 +91,7 @@ class ChatGPT:
                         "role": "user",
                         "content": [
                             {"type": "input_text", "text": f""" 
-                            Tag dette vedhæftede billede og lav det 40% om. Så det ligner originalen, men har en lille variation.
-                            Det skal størrelsesmæssigt passe til en artikel.
-                            Hvis billedet indeholder et logo eller varemærke må selve dette ikke ændres, så skal ting som baggrunden eller andre detaljer ændres for at skabe variation.
+                            {Image_prompt}
                             """},
                             {
                                 "type": "input_image",
