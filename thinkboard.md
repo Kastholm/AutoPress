@@ -27,3 +27,15 @@ ___
 # Problemstillinger.
 - Billeder af rigtige personer, hvor ret ikke haves til at oprette billeder af dem.
     - Kan løses ved at optimere img prompt
+- Timer
+- Filer med prompts
+- Ryd op i log meddelser
+==very important words==
+
+	I need to highlight these ==very important words==.
+
+### My Great Heading {#test} 
+
+`⛔ AUTH Connection to new site opdateret.dk failed: 400, {"code":"rest_invalid_param","message":"Invalid parameter(s): tags","data":{"status":400,"params":{"tags":"tags[0] is not of type integer."},"details":{"tags":{"code":"rest_invalid_type","message":"tags[0] is not of type integer.","data":{"param":"tags[0]"}}}}}`
+
+> # Test

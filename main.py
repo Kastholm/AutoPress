@@ -34,14 +34,18 @@ class AutoPress():
     
     def log(self, log_content, header):
         if header == 'h1':
-            header = '#'
+            header = '> #'
         elif header == 'h2':
-            header = '##'
+            header = '> ##'
         elif header == 'h3':
-            header = '###'
+            header = '> ###'
         elif header == 'h4':
-            header = '####'
+            header = '> ####'
+        elif header == 'code':
+            header = '``'
             
+        if not os.path.exists(self.name):
+            os.makedirs(self.name)
         if not os.path.exists(f'{self.name}/log.md'):
             with open(f'{self.name}/log.md', 'w') as f:
                 f.write('')
