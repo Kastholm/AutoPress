@@ -40,7 +40,9 @@ class AutoPress():
             text_type = f'#### {log_content}'
         elif text_type == 'list':
             text_type = f'- {log_content}'
-
+            
+        if not os.path.exists(pages):
+            os.makedirs(pages)
         if not os.path.exists(pages/{self.name}):
             os.makedirs(pages/{self.name})
         if not os.path.exists(f'pages/{self.name}/log.md'):
@@ -51,6 +53,8 @@ class AutoPress():
             f.write(f'{text_type}\n')
 
     def generate_load_files(self):
+        if not os.path.exists(pages):
+            os.makedirs(pages)
         if not os.path.exists(pages/self.name):
             os.makedirs(pages/self.name)
         if not os.path.exists(f'pages/{self.name}/articles.json'):
