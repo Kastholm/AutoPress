@@ -20,8 +20,8 @@ class AutoPress():
         self.eligible_posts_arr = []
         self.posts_to_publish = []
         self.img_id = ''
-        self.testing_mode = False
-        self.log(f'{"⛔ Starting in testing mode" if self.testing_mode else " ✅ Starting in production mode"}', 'h1')
+        self.testing_mode = True
+        self.log(f'{"⛔⛔ Starting in testing mode ⛔⛔" if self.testing_mode else " ✅✅ Starting in production mode ✅✅"}', 'h1')
         self.fetch_compare_articles()
         self.generate_new_articles()
         self.publish_articles()
@@ -32,22 +32,24 @@ class AutoPress():
         clean = pattern.sub("", text)
         return html.unescape(clean)
     
-    def log(self, log_content, header):
-        if header == 'h1':
-            header = '#'
-        elif header == 'h2':
-            header = '##'
-        elif header == 'h3':
-            header = '###'
-        elif header == 'h4':
-            header = '####'
-            
+    def log(self, log_content, text_type):
+        if text_type == 'h1':
+            text_type = f'> ## {log_content}'
+        elif text_type == 'h2':
+            text_type = f'### {log_content}'
+        elif text_type == 'h3':
+            text_type = f'#### {log_content}'
+        elif text_type == 'list':
+            text_type = f'- {log_content}'
+
+        if not os.path.exists(self.name):
+            os.makedirs(self.name)
         if not os.path.exists(f'{self.name}/log.md'):
             with open(f'{self.name}/log.md', 'w') as f:
                 f.write('')
 
         with open(f'{self.name}/log.md', 'a', encoding='utf-8') as f:
-            f.write(f'{header} {log_content}\n')
+            f.write(f'{text_type}\n')
 
 
     def generate_load_files(self):
@@ -68,26 +70,26 @@ class AutoPress():
 
     def fetch_compare_articles(self):
 
-        self.log('🟢 Fetching articles from WordPress', 'h1')
         fetch_articles_req = req.get(self.post_fetch_url)
 
         if fetch_articles_req.status_code == 200:
-            self.log('✅ Fetched articles from WordPress sucessfully', 'h2')
+            self.log('✅ Fetched posts from WordPress sucessfully', 'h1')
             load_article_json_file = self.generate_load_files()
             fetched_articles_req_json = fetch_articles_req.json()
             for article in fetched_articles_req_json:
-                self.log(f' 🔍 Reading article {article["title"]["rendered"]} from WordPress', 'h3')
+                self.log(f'🔍 Reading article ID: {article["id"]} from WordPress', 'h3')
                 image_title = ''
                 image_caption = ''
                 image_desc = ''
                 image_src_id = req.get(f"https://{self.url}/wp-json/wp/v2/media/{article['featured_media']}")
-                self.log(f' 🔍 Reading image {article["featured_media"]} from WordPress', 'h3')
                 if image_src_id.status_code == 200:
-                    self.log(f' ✅ Image {article["featured_media"]} found in WordPress', 'h4')
+                    self.log(f' ✅ Image with ID: {article["featured_media"]} found in WordPress', 'list')
                     image_json = image_src_id.json()
                     image_title = image_json['title']['rendered']
                     image_caption = image_json['caption']['rendered']
                     image_desc = image_json['alt_text']
+                else:
+                    self.log(f' ❌ Image with ID: {article["featured_media"]} not found in WordPress', 'list')
 
                 article_arr = ({
                     "id": article['id'],
@@ -101,7 +103,7 @@ class AutoPress():
                 })
                 #If fetched article is not in the JSON file, add it to the eligible posts array
                 if article_arr not in load_article_json_file:
-                    self.log(f' 🔍 Article {article["title"]["rendered"]} not in JSON file, adding to eligible posts array', 'h3')
+                    self.log(f'🔍 Article ID: {article["id"]} not in JSON file, adding to eligible posts array', 'list')
                     self.eligible_posts_arr.append(article_arr)
             
             load_article_json_file.extend(self.eligible_posts_arr)
@@ -110,7 +112,7 @@ class AutoPress():
                 json.dump(load_article_json_file, f, indent=4, ensure_ascii=False)
         
         else:
-            self.log('❌ Error fetching posts from WordPress ❌', 'h2')
+            self.log('❌ Error fetching posts from WordPress ❌', 'h1')
             
         return self.eligible_posts_arr
 
@@ -126,7 +128,7 @@ class AutoPress():
 
         for article in file_data:
             if article['id'] not in existing_ids:
-                self.log(f' 🟢 Generating new article {article["title"]}', 'h1')
+                self.log(f'🟢 Starting to generate new article from ID: {article["id"]}', 'h2')
 
                 if self.testing_mode:
                     #----- Test -----
@@ -159,7 +161,7 @@ class AutoPress():
                 with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
                     json.dump(gen_articles, f, indent=4, ensure_ascii=False)
             else:
-                self.log(f' 🔍 Article {article["title"]} already generated', 'h1')
+                self.log(f'🔍 Article {article["title"]} already generated', 'h1')
 
 
     def publish_articles(self):
