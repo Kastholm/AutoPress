@@ -40,23 +40,23 @@ class AutoPress():
             text_type = f'#### {log_content}'
         elif text_type == 'list':
             text_type = f'- {log_content}'
-            
-        if not os.path.exists(pages):
-            os.makedirs(pages)
-        if not os.path.exists(pages/{self.name}):
-            os.makedirs(pages/{self.name})
+
+        if not os.path.exists("pages"):
+            os.makedirs("pages")
+        if not os.path.exists(f'pages/{self.name}'):
+            os.makedirs(f'pages/{self.name}')
         if not os.path.exists(f'pages/{self.name}/log.md'):
             with open(f'pages/{self.name}/log.md', 'w') as f:
                 f.write('')
 
-        with open(f'{self.name}/log.md', 'a', encoding='utf-8') as f:
+        with open(f'pages/{self.name}/log.md', 'a', encoding='utf-8') as f:
             f.write(f'{text_type}\n')
 
     def generate_load_files(self):
-        if not os.path.exists(pages):
-            os.makedirs(pages)
-        if not os.path.exists(pages/self.name):
-            os.makedirs(pages/self.name)
+        if not os.path.exists("pages"):
+            os.makedirs("pages")
+        if not os.path.exists(f'pages/{self.name}'):
+            os.makedirs(f'pages/{self.name}')
         if not os.path.exists(f'pages/{self.name}/articles.json'):
             with open(f'pages/{self.name}/articles.json', 'w') as f:
                 json.dump([], f)
@@ -110,7 +110,7 @@ class AutoPress():
             
             load_article_json_file.extend(self.eligible_posts_arr)
 
-            with open(f'{self.name}/articles.json', 'w', encoding='utf-8') as f:
+            with open(f'pages/{self.name}/articles.json', 'w', encoding='utf-8') as f:
                 json.dump(load_article_json_file, f, indent=4, ensure_ascii=False)
         
         else:
@@ -158,7 +158,7 @@ class AutoPress():
                 gen_articles.append(parsed_article)
                 self.posts_to_publish.append(parsed_article)
                 
-                with open(f'{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
+                with open(f'pages/{self.name}/gen_articles.json', 'w', encoding='utf-8') as f:
                     json.dump(gen_articles, f, indent=4, ensure_ascii=False)
             else:
                 self.log(f'🔍 Article {article["title"]} already generated', 'h1')
